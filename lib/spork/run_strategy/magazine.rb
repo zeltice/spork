@@ -21,7 +21,7 @@ require 'magazine/rinda_ring_finger_patch' if RUBY_VERSION > '1.9.1'
 
 class Spork::RunStrategy::Magazine < Spork::RunStrategy
 
-  Slave_Id_Range = 1..2 # Ringserver uses id: 0. Slave use: 1..MAX_SLAVES
+  Slave_Id_Range = 1..8 # Ringserver uses id: 0. Slave use: 1..MAX_SLAVES
 
   def slave_max
     Slave_Id_Range.to_a.size
@@ -69,11 +69,11 @@ class Spork::RunStrategy::Magazine < Spork::RunStrategy
       # jruby 1.8 has no easy way to just spawn, so use a thread
       Dir.chdir(@path) do
         io = IO.popen app
-        Thread.new { puts io.read }        
+        Thread.new { puts io.read }
         return io.pid
       end
     end
-    
+
     if RUBY_VERSION < '1.9.1'
       Process.create( :app_name => app, :cwd => @path ).process_id
     else
@@ -120,10 +120,10 @@ class Spork::RunStrategy::Magazine < Spork::RunStrategy
       Process.kill(9, pid)
     end
   end
-  
+
   def kill_all_processes
 
-    @pids.each {|pid| 
+    @pids.each {|pid|
       kill_slave(pid)
     }
     puts "\nKilling processes."; $stdout.flush
